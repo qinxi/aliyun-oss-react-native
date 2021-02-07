@@ -255,7 +255,7 @@ public class AliyunUploadManager {
             metadata.setHeader("x-oss-object-acl", options.getString("x-oss-object-acl"));
         }
 
-        InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(bucketName, objectKey, options);
+        InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(bucketName, objectKey, metadata);
         InitiateMultipartUploadResult initResult = null;
         try {
             initResult = mOSS.initMultipartUpload(init);
