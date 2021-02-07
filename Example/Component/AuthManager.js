@@ -12,7 +12,7 @@ import {
 
 
 const configuration = {
-  maxRetryCount: 3,  
+  maxRetryCount: 3,
   timeoutIntervalForRequest: 30,
   timeoutIntervalForResource: 24 * 60 * 60
 };
@@ -33,24 +33,24 @@ const companyserver = "http://XXX:PORT"
 const familyserver = "http://XXX:PORT"
 
 //导入样式
-import { styles } from '../CSS/global.js' 
+import { styles } from '../CSS/global.js'
 
 export class AuthManager extends Component {
-  
+
   render() {
     return (
       <View style={styles.item}>
         <Text style={styles.description}>Client初始化</Text>
         <View style={styles.detailitem}>
-          
+
           <View style={styles.button}>
             <Button
               onPress={this.handClick.bind(this,"AKSK")}
               title="AKSK明文"
               color="#841584"
             />
-          </View> 
-        
+          </View>
+
           <View style={styles.button}>
             <Button  style={styles.button}
               onPress={this.handClick.bind(this,"Singer")}
@@ -97,8 +97,12 @@ export class AuthManager extends Component {
       } break;
 
       case "STS": {
-        AliyunOSS.initWithSecurityToken(STSConfig.SecurityToken,STSConfig.AccessKeyId,STSConfig.SecretKeyId,endPoint,configuration)
-        Alert.alert('STS success!')
+        fetch({url: "http://10.12.0.36:8082/api/v1/upload/oss-sts"}).then(resp => resp.json()).then(resp=>{
+          console.log(resp)
+          AliyunOSS.initWithSecurityToken(resp.SecurityToken,resp.AccessKeyId,resp.AccessKeySecret,resp.endpoint,configuration)
+          Alert.alert('STS success!')
+        });
+
       } break;
 
       case "ServerSTS" : {

@@ -13,12 +13,12 @@ import {
 
 //保存初始化分片上传ID
 let uploadId;
-const multipartBucket = "luozhang002"
-const mulitipartObject = "extremlyboy"
+const multipartBucket = "rampage-callcenter-test"
+const mulitipartPrefix = "dashen/posts/-1/" + new Date().getTime() + "_";
 let ImagePicker = require('react-native-image-picker');
 
 //导入样式
-import { styles } from '../CSS/global.js' 
+import { styles } from '../CSS/global.js'
 
 const  options = {
   title: 'Select Avatar',
@@ -31,22 +31,31 @@ const  options = {
   }
 };
 
-export class UploadManager extends Component {  
-  render() {  
+const metadata = {
+  'x-oss-object-acl': 'public-read',
+};
+let partSize = 128 * 1024
+const mulitpartUploadConfig = {
+  "partSize":partSize,
+  'x-oss-object-acl': 'public-read',
+}
+
+export class UploadManager extends Component {
+  render() {
     return(
       <View style={styles.item}>
         <Text style={styles.description}>文件上传操作</Text>
         <Image source={require('../resource/putao.jpeg')}/>
         <View style={styles.detailitem}>
-          
+
           <View style={styles.button}>
             <Button
               onPress={this.handleClick.bind(this,"uploadFile")}
               title="上传文件"
               color="#841584"
             />
-          </View> 
-        
+          </View>
+
           <View style={styles.button}>
             <Button  style={styles.button}
               onPress={this.handleClick.bind(this,"appendObject")}
@@ -96,7 +105,7 @@ export class UploadManager extends Component {
           </View>
         </View>
       </View>
-    )  
+    )
   }
 
   handleClick(e) {
@@ -116,10 +125,10 @@ export class UploadManager extends Component {
             console.log('User tapped custom button: ', response.customButton);
           }
           else {
-            
+
             let source = { uri: response.uri };
-            
-            AliyunOSS.asyncUpload("luozhang002", "xxxxxxxx/yanxing", source.uri).then((res)=>{
+
+            AliyunOSS.asyncUpload(multipartBucket, mulitipartPrefix+response.fileName, source.uri).then((res)=>{
               Alert.alert(
                 'Alert Title',
                 "恭喜你成功上传到阿里云服务器",
@@ -149,10 +158,10 @@ export class UploadManager extends Component {
             console.log('User tapped custom button: ', response.customButton);
           }
           else {
-            
+
             let source = { uri: response.uri };
             let position = 0;
-            AliyunOSS.asyncAppendObject("luozhang002", "xxx", source.uri,{appendPostion:`${position}`}).then((res)=>{
+            AliyunOSS.asyncAppendObject(multipartBucket, mulitipartPrefix+response.fileName, source.uri,{appendPostion:`${position}`}).then((res)=>{
               nextPositon = res.nextPositon;
               //再次调用即可
             })
@@ -160,7 +169,7 @@ export class UploadManager extends Component {
         });
       } break;
 
-      case "resumeObject" : {  
+      case "resumeObject" : {
         ImagePicker.showImagePicker(options, (response) => {
           console.log('Response = ', response);
           if (response.didCancel) {
@@ -174,7 +183,7 @@ export class UploadManager extends Component {
           }
           else {
             let source = { uri: response.uri };
-            AliyunOSS.asyncResumableUpload("luozhang002", "zhongji", source.uri).then((res)=>{
+            AliyunOSS.asyncResumableUpload(multipartBucket, mulitipartPrefix+response.fileName, source.uri).then((res)=>{
               Alert.alert(
                 'Alert Title',
                 "恭喜你上传成功",
@@ -191,7 +200,7 @@ export class UploadManager extends Component {
       } break;
 
       case "initMultipartUpload" : {
-        AliyunOSS.initMultipartUpload(multipartBucket,multipartBucket).then((e)=>{
+        AliyunOSS.initMultipartUpload(multipartBucket,mulitipartPrefix+"test.jpg",metadata).then((e)=>{
           Alert.alert("分片初始化成功：" + e);
           uploadId = e;
         }).catch((error)=>{
@@ -200,7 +209,7 @@ export class UploadManager extends Component {
       } break
 
       case "multipartUpload" : {
-        
+
         ImagePicker.showImagePicker(options, (response) => {
           console.log('Response = ', response);
 
@@ -212,7 +221,7 @@ export class UploadManager extends Component {
             console.log('User tapped custom button: ', response.customButton);
           } else {
             let source = { uri: response.uri };
-            AliyunOSS.multipartUpload(multipartBucket,mulitipartObject,uploadId,source.uri).then((res)=>{
+            AliyunOSS.multipartUpload(multipartBucket, mulitipartPrefix + "test.jpg", uploadId, source.uri, mulitpartUploadConfig).then((res) => {
               Alert.alert("分片上传成功");
             }).catch((e)=>{
               Alert.alert("分片上传失败");
@@ -222,7 +231,7 @@ export class UploadManager extends Component {
       } break;
 
       case "abortMultipartUpload" : {
-        AliyunOSS.abortMultipartUpload(multipartBucket,multipartBucket,uploadId).then((e)=>{
+        AliyunOSS.abortMultipartUpload(multipartBucket,mulitipartPrefix+"test.jpg",uploadId).then((e)=>{
           Alert.alert("分片终止成功");
         }).catch((e)=>{
           Alert.alert("分片终止失败");
@@ -231,7 +240,7 @@ export class UploadManager extends Component {
 
       case "listParts" : {
 
-        AliyunOSS.listParts(multipartBucket,multipartBucket,uploadId).then((e)=>{
+        AliyunOSS.listParts(multipartBucket,mulitipartPrefix+"test.jpg",uploadId).then((e)=>{
           Alert.alert("onListParts"+e)
         }).catch((e)=>{
           Alert.alert("onListPartsError")
@@ -247,5 +256,5 @@ export class UploadManager extends Component {
     const uploadProgress = p => console.log(p.currentSize / p.totalSize);
     AliyunOSS.addEventListener('uploadProgress', uploadProgress);
   }
-  
+
  }
