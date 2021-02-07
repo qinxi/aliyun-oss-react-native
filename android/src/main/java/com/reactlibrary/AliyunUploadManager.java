@@ -340,6 +340,13 @@ public class AliyunUploadManager {
         }
 
         CompleteMultipartUploadRequest complete = new CompleteMultipartUploadRequest(bucketName, objectKey,uploadId,partETags);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        if (options.hasKey("x-oss-object-acl")){
+            metadata.setHeader("x-oss-object-acl", options.getString("x-oss-object-acl"));
+        }
+        complete.setMetadata(metadata);
+
         CompleteMultipartUploadResult completeResult = null;
         try {
             completeResult = mOSS.completeMultipartUpload(complete);
