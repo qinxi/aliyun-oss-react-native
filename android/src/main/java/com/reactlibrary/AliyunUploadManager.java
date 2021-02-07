@@ -248,9 +248,14 @@ public class AliyunUploadManager {
      * @param objectKey
      * @param promise
      */
-    public void initMultipartUpload(String bucketName,String objectKey,final Promise promise) {
+    public void initMultipartUpload(String bucketName,String objectKey,ReadableMap options,final Promise promise) {
         String uploadId;
-        InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(bucketName, objectKey);
+        ObjectMetadata metadata = new ObjectMetadata();
+        if (options.hasKey("x-oss-object-acl")){
+            metadata.setHeader("x-oss-object-acl", options.getString("x-oss-object-acl"));
+        }
+
+        InitiateMultipartUploadRequest init = new InitiateMultipartUploadRequest(bucketName, objectKey, options);
         InitiateMultipartUploadResult initResult = null;
         try {
             initResult = mOSS.initMultipartUpload(init);

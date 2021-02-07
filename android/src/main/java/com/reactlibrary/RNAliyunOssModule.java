@@ -221,8 +221,8 @@ public class RNAliyunOssModule extends ReactContextBaseJavaModule {
      * @param promise
      */
     @ReactMethod
-    public void initMultipartUpload(String bucketName,String objectKey,final Promise promise) {
-        mUploadManager.initMultipartUpload(bucketName, objectKey, promise);
+    public void initMultipartUpload(String bucketName,String objectKey,ReadableMap options,final Promise promise) {
+        mUploadManager.initMultipartUpload(bucketName, objectKey,options, promise);
     }
 
     /**
